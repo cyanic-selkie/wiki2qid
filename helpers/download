@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+LANGUAGES=()
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --download-dir)
+      DOWNLOAD_DIR="$2"
+      shift
+      shift
+      ;;
+    --language)
+      LANGUAGES+=("$2")
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown argument \"$1\"."
+      exit 1
+      ;;
+    *)
+      echo "Positional arguments (i.e., \"$1\") aren't supported."
+      exit 1;
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$DOWNLOAD_DIR" ]; then
+  echo "You must provide a download directory for the data.";
+  exit 1;
+fi
+
+if [ ${#LANGUAGES[@]} -eq 0 ]; then
+  echo "You must provide at least one language.";
+  exit 1;
+fi
+
+mkdir -p "$DOWNLOAD_DIR"
+
+for LANGUAGE in "${LANGUAGES[@]}"
+do
+  mkdir -p "$DOWNLOAD_DIR/$LANGUAGE"
+done
+
+for LANGUAGE in "${LANGUAGES[@]}"
+do
+  wget -q --show-progress -c -P "$DOWNLOAD_DIR/$LANGUAGE" "https://dumps.wikimedia.org/${LANGUAGE}wiki/latest/${LANGUAGE}wiki-latest-page.sql.gz"
+  wget -q --show-progress -c -P "$DOWNLOAD_DIR/$LANGUAGE" "https://dumps.wikimedia.org/${LANGUAGE}wiki/latest/${LANGUAGE}wiki-latest-page_props.sql.gz"
+  wget -q --show-progress -c -P "$DOWNLOAD_DIR/$LANGUAGE" "https://dumps.wikimedia.org/${LANGUAGE}wiki/latest/${LANGUAGE}wiki-latest-redirect.sql.gz"
+done
+
+for LANGUAGE in "${LANGUAGES[@]}"
+do
+  gzip -d "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-page.sql.gz"
+  gzip -d "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-page_props.sql.gz"
+  gzip -d "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-redirect.sql.gz"
+done

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+LANGUAGES=()
+
+OUTPUT_FILENAME="wiki2qid.avro"
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --download-dir)
+      DOWNLOAD_DIR="$2"
+      shift
+      shift
+      ;;
+    --output-dir)
+      OUTPUT_DIR="$2"
+      shift
+      shift
+      ;;
+    --output-filename)
+      OUTPUT_FILENAME="$2"
+      shift
+      shift
+      ;;
+    --language)
+      LANGUAGES+=("$2")
+      shift
+      shift
+      ;;
+    -*|--*)
+      echo "Unknown argument \"$1\"."
+      exit 1
+      ;;
+    *)
+      echo "Positional arguments (i.e., \"$1\") aren't supported."
+      exit 1;
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$DOWNLOAD_DIR" ]; then
+  echo "You must provide the download directory for the data.";
+  exit 1;
+fi
+
+if [ -z "$OUTPUT_DIR" ]; then
+  echo "You must provide an output directory for the data.";
+  exit 1;
+fi
+
+if [ ${#LANGUAGES[@]} -eq 0 ]; then
+  echo "You must provide at least one language.";
+  exit 1;
+fi
+
+mkdir -p "$OUTPUT_DIR"
+
+for LANGUAGE in "${LANGUAGES[@]}"
+do
+  mkdir -p "$OUTPUT_DIR/$LANGUAGE"
+done
+
+for LANGUAGE in "${LANGUAGES[@]}"
+do
+  if ! command -v wiki2qid &> /dev/null
+  then
+    cargo run --release -- --input-page "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-page.sql" \
+                      --input-page-props "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-page_props.sql" \
+                      --input-redirect "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-redirect.sql" \
+                      --output "$OUTPUT_DIR/$LANGUAGE/$OUTPUT_FILENAME"
+  else
+    wiki2qid --input-page "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-page.sql" \
+                      --input-page-props "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-page_props.sql" \
+                      --input-redirect "$DOWNLOAD_DIR/$LANGUAGE/${LANGUAGE}wiki-latest-redirect.sql" \
+                      --output "$OUTPUT_DIR/$LANGUAGE/$OUTPUT_FILENAME"
+  fi
+done

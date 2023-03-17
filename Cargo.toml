@@ -1,0 +1,17 @@
+[package]
+name = "wiki2qid"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+authors = ["cyanic-selkie <cyanic-selkie@protonmail.com>"]
+description = "A program for efficiently generating mappings between Wikipedia's titles, Wikipedia's page IDs, and Wikidata's QIDs."
+readme = "README.md"
+repository = "https://github.com/cyanic-selkie/wiki2qid"
+categories = ["command-line-utilities"]
+
+[dependencies]
+apache-avro = "0.14.0"
+clap = { version = "4.1.8", features = ["derive"] }
+csv = "1.2.1"
+hashbrown = "0.13.2"
+unicode-normalization = "0.1.22"
