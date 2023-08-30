@@ -80,7 +80,7 @@ You can pass in any number of languages.
 After you've done that, you can generate the mappings with the following command:
 
 ```bash
-./extract --download-dir ${DOWNLOAD_DIR} --output-dir ${OUTPUT_DIR} --output-filename ${OUTPUT_FILENAME} --language ${LANGUAGE_1} --language ${LANGUAGE_2}
+./generate --download-dir ${DOWNLOAD_DIR} --output-dir ${OUTPUT_DIR} --output-filename ${OUTPUT_FILENAME} --language ${LANGUAGE_1} --language ${LANGUAGE_2}
 ```
 
 The argument `--output-filename` is optional and has the default value of `wiki2qid.avro`.
